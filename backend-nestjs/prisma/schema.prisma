@@ -41,6 +41,8 @@ model User {
   password     String
   firstName    String?
   lastName     String?
+  birthday     DateTime?
+  phoneNumber  String?
   role         Role    @default(USER)
   refreshToken String?
 
