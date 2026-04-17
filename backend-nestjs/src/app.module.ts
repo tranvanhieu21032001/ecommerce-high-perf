@@ -8,6 +8,7 @@ import { RedisModule } from './common/redis/redis.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { UserModule } from './modules/user/user.module';
 import Redis from 'ioredis';
 
 @Module({
@@ -43,6 +44,7 @@ import Redis from 'ioredis';
     PrismaModule,
     AuthModule,
     RedisModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
