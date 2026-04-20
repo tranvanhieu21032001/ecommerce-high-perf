@@ -9,6 +9,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { UserModule } from './modules/user/user.module';
+import { CategoryModule } from './modules/category/category.module';
 import Redis from 'ioredis';
 
 @Module({
@@ -45,6 +46,7 @@ import Redis from 'ioredis';
     AuthModule,
     RedisModule,
     UserModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [
