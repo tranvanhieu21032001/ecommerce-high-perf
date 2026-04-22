@@ -27,6 +27,14 @@ export class ProductResponseDto {
   price: number;
 
   @ApiProperty({
+    description: 'Original product price before flash sale',
+    example: 129.99,
+    nullable: true,
+    required: false,
+  })
+  originalPrice?: number | null;
+
+  @ApiProperty({
     description: 'Product stock',
     example: 100,
   })
@@ -67,4 +75,19 @@ export class ProductResponseDto {
     description: 'Last update timestamp',
   })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Flash sale discount percent',
+    example: 20,
+    nullable: true,
+    required: false,
+  })
+  flashSalePercent?: number | null;
+
+  @ApiProperty({
+    description: 'Flash sale ending time',
+    nullable: true,
+    required: false,
+  })
+  flashSaleEndsAt?: Date | null;
 }

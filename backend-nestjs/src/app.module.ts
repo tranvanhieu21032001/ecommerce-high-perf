@@ -5,12 +5,16 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { RedisModule } from './common/redis/redis.module';
+import { RabbitMQModule } from './common/rabbitmq/rabbitmq.module';
+import { EmailModule } from './common/email/email.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 import { UserModule } from './modules/user/user.module';
 import { CategoryModule } from './modules/category/category.module';
+import { FlashSalesModule } from './modules/flash-sales/flash-sales.module';
 import { ProductsModule } from './modules/products/products.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import Redis from 'ioredis';
 
 @Module({
@@ -46,9 +50,13 @@ import Redis from 'ioredis';
     PrismaModule,
     AuthModule,
     RedisModule,
+    RabbitMQModule,
+    EmailModule,
     UserModule,
     CategoryModule,
+    FlashSalesModule,
     ProductsModule,
+    OrdersModule,
   ],
   controllers: [AppController],
   providers: [

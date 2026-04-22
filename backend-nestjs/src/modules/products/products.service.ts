@@ -8,6 +8,7 @@ import {
 import { Category, Prisma, Product } from '@prisma/client';
 import Redis from 'ioredis';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FlashSalesService } from '../flash-sales/flash-sales.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { QueryProductDto } from './dto/query-product.dto';
@@ -42,6 +43,7 @@ export class ProductsService {
 
   constructor(
     private prisma: PrismaService,
+    private readonly flashSalesService: FlashSalesService,
     @Inject('REDIS_CLIENT') private readonly redis: Redis,
   ) {}
 
@@ -94,9 +96,17 @@ export class ProductsService {
         },
       }),
     ]);
+    const activeRules = await this.flashSalesService.getActiveRulesRaw();
 
     const response = {
-      data: products.map((product) => this.formatProduct(product)),
+      data: products.map((product) =>
+        this.applyFlashSale(
+          this.formatProduct(product),
+          product.id,
+          product.categoryId,
+          activeRules,
+        ),
+      ),
       meta: {
         total,
         page,
@@ -126,7 +136,13 @@ export class ProductsService {
       throw new NotFoundException('Product not found');
     }
 
-    const response = this.formatProduct(product);
+    const activeRules = await this.flashSalesService.getActiveRulesRaw();
+    const response = this.applyFlashSale(
+      this.formatProduct(product),
+      product.id,
+      product.categoryId,
+      activeRules,
+    );
     await this.setCache(cacheKey, response, this.productDetailCacheTtlSeconds);
     return response;
   }
@@ -356,6 +372,33 @@ export class ProductsService {
       isActive: product.isActive,
       createdAt: product.createdAt,
       updatedAt: product.updatedAt,
+    };
+  }
+
+  private applyFlashSale(
+    product: ProductResponseDto,
+    productId: string,
+    categoryId: string,
+    activeRules: Awaited<ReturnType<FlashSalesService['getActiveRulesRaw']>>,
+  ): ProductResponseDto {
+    const rule = this.flashSalesService.findBestDiscount(activeRules, productId, categoryId);
+    if (!rule) {
+      return {
+        ...product,
+        originalPrice: null,
+        flashSalePercent: null,
+        flashSaleEndsAt: null,
+      };
+    }
+
+    const discountedPrice = Number((product.price * (1 - rule.discountPercent / 100)).toFixed(2));
+
+    return {
+      ...product,
+      originalPrice: product.price,
+      price: discountedPrice,
+      flashSalePercent: rule.discountPercent,
+      flashSaleEndsAt: new Date(rule.endAt),
     };
   }
 }
