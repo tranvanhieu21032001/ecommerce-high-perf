@@ -7,13 +7,11 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserResponseDto } from './dto/user-response.dto';
-import type { RequestWithUser } from 'src/common/interface/request-with-user.interface';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth-guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -33,8 +31,8 @@ export class UserController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'The current user profile', type: UserResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getProfile(@Req() req: RequestWithUser): Promise<UserResponseDto> {
-    return await this.userService.findOne(req.user.id);
+  getProfile(@GetUser() user: UserResponseDto): UserResponseDto {
+    return user;
   }
 
   @Get()
